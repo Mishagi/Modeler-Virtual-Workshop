@@ -1,0 +1,88 @@
+<Process name="TourVisit::TourVisitMapProcess" defaultAction="ShowTourVisitMap" schemaVersion="0.0.0.5">
+  <Entry>
+    <ProcessContext>
+      <Declarations>
+        <Declaration name="TourBo" type="BoTourData" />
+        <Declaration name="TourVisits" type="LoTourVisits" />
+        <Declaration name="TourVisits_TimeVisibility" type="DomBool" />
+        <!-- Map -->
+        <Declaration name="Map_ShowMapDetails" type="DomBool" />
+        <Declaration name="Map_DisplayTraffic" type="DomBool" />
+        <Declaration name="Map_DisplayRoute" type="DomBool" />
+        <Declaration name="Map_CurrentPosition" type="Object" /> 
+        <Declaration name="Map_Details" type="LuMapDetail" />
+      </Declarations>
+      <Parameters>
+        <Input name="TourId" type="DomPKey" />
+      </Parameters>
+    </ProcessContext>
+    <EntryActions>
+      <Action name="LoadBo" actionType="LOAD" type="BoTourData">
+        <Parameters>
+          <Input name="pKey" value="ProcessContext::TourId" />
+        </Parameters>
+        <Return name="ProcessContext::TourBo" />
+      </Action>
+      <!-- Tour Visits List Start -->
+      <Action name="LoadTourVisits" actionType="LOAD" type="LoTourVisits">
+        <Parameters>
+          <Input name="tourId" value="ProcessContext::TourId" />
+        </Parameters>
+        <Return name="ProcessContext::TourVisits" />
+      </Action>
+      <Action name="GetTourVisits_TimeVisibility" actionType="LOGIC" call="ApplicationContext::User.boUserSettings.getClbAgendaDisplayTimeMobility">
+        <Return name="ProcessContext::TourVisits_TimeVisibility" />
+      </Action>
+      <Action name="TourVisits_setEARights" actionType="LOGIC" call="ProcessContext::TourVisits.setEARights">
+        <Parameters>
+          <Input name="timeVisibilty" value="ProcessContext::TourVisits_TimeVisibility" />
+        </Parameters>
+      </Action>
+      <!-- Tour Visits List End -->
+      <!-- Map Configuration Start -->
+      <Action name="HideMapDetails" actionType="LOGIC" call="Utils.identity">
+        <Parameters>
+          <Input name="value" value="0" type="Literal" />
+        </Parameters>
+        <Return name="ProcessContext::Map_ShowMapDetails" />
+      </Action>
+      <Action name="InitializeDisplayTrafficWithUserSetting" actionType="LOGIC" call="ApplicationContext::User.boUserSettings.getClbDisplayTrafficInMapMobility">
+        <Return name="ProcessContext::Map_DisplayTraffic" />
+      </Action>
+      <Action name="InitializeDisplayRouteWithUserSetting" actionType="LOGIC" call="ApplicationContext::User.boUserSettings.getClbDisplayRouteInMapMobility">
+        <Return name="ProcessContext::Map_DisplayRoute" />
+      </Action>
+      <!-- Map Configuration End -->
+    </EntryActions>
+  </Entry>
+  <Body>
+    <Actions>
+      <Action actionType="VIEW" name="ShowTourVisitMap">
+        <UIDescription>TourVisit::TourVisitMapUI</UIDescription>
+        <Events>
+          <Event name="loadGoogleMapDetails" action="GetCurrentPosition" />
+        </Events>
+      </Action>
+      <Action name="GetCurrentPosition" actionType="LOGIC" call="Utils.getCurrentPosition">
+        <Return name="ProcessContext::Map_CurrentPosition" />
+        <TransitionTo action="Map_LoadDetails" />
+      </Action>
+      <Action name="Map_LoadDetails" actionType="LOGIC" call="ProcessContext::TourVisits.prepareMapDetails">
+        <Parameters>
+          <Input name="visitPKey" value="event.pkey" />
+          <Input name="currentLatitude" value="ProcessContext::Map_CurrentPosition.latitude" />
+          <Input name="currentLongitude" value="ProcessContext::Map_CurrentPosition.longitude" />
+        </Parameters>
+        <Return name="ProcessContext::Map_Details" />
+        <TransitionTo action="Map_ShowDetails" />
+      </Action>
+      <Action name="Map_ShowDetails" actionType="LOGIC" call="Utils.identity">
+        <Parameters>
+          <Input name="value" value="1" type="Literal" />
+        </Parameters>
+        <Return name="ProcessContext::Map_ShowMapDetails" />
+        <TransitionTo action="ShowTourVisitMap" />
+      </Action>
+    </Actions>
+  </Body>
+</Process>
