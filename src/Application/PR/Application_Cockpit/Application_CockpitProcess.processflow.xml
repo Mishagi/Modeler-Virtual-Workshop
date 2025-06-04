@@ -45,6 +45,11 @@
         <!--  Visist Rate -->
         <Declaration name="CardReportingVisitRate_Visits" type="LoAgendaOverview" />
         <Declaration name="CardReportingVisitRate_Rate" type="String" />
+        
+        <!-- Card: Display -->
+        <Declaration name="CardDisplay_DataLoaded" type="DomBool"/>
+        <Declaration name="CardDisplay_SubComponentName" type="String"/>
+        
         <!-- Card: User Welcome -->
         <Declaration name="CardUserWelcome_DataLoaded" type="DomBool" />
         <Declaration name="LuCallCount" type="LuCallCountByDate" />
@@ -225,6 +230,10 @@
           <!-- Card: Reporting Sales -->
           <Event name="CardReporting_loadData" action="CardReporting_SetDataReady" />
           <Event name="CardReportingSales_showMaximizedReport" action="CardReportingSales_showMaximizedReport" />
+
+          <!-- Card: Display -->
+          <Event name="CardDisplay_loadData" action="CardDisplay_loadData"/>
+
           <!-- Card: User Welcome-->
           <Event name="CardUserWelcome_loadData" action="CardUserWelcome_loadData" />
           <!-- Card: User Notifications-->
@@ -810,6 +819,24 @@
         <Return name="ProcessContext::LuIssueCount" />
       </Action>
       <!-- Card: User Welcome  END-->
+
+      <!-- Card: Display START -->
+      <Action name="CardDisplay_loadData" actionType="LOGIC" call="Utils.identity">
+        <Parameters>
+          <Input name="value" value="1" type="Literal" />
+        </Parameters>
+        <Return name="ProcessContext::CardDisplay_DataLoaded" />
+        <TransitionTo action="CardDisplay_setSubcomponentName"/>
+      </Action>
+
+      <Action name="CardDisplay_setSubcomponentName" actionType="LOGIC" call="Utils.identity">
+        <Parameters>
+          <Input name="value" value="CardNoDataMessageUiPlugin" type="Literal" />
+        </Parameters>
+        <Return name="ProcessContext::CardDisplay_SubComponentName" />
+      </Action>
+      <!-- Card: Display END -->
+
       <!-- Card: Mobile Links  START-->
       <Action name="SetCardMobileLinks_DataLoaded" actionType="LOGIC" call="Utils.identity">
         <Parameters>

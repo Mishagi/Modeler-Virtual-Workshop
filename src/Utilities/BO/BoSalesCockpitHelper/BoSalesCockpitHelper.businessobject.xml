@@ -27,6 +27,7 @@
     <SimpleProperty name="isCurrentDateIsToday" type="DomBool" />
     <SimpleProperty name="collapseState_CardMobileLinks" type="DomBool" />
     <SimpleProperty name="collapseState_CardQuickAccess" type="DomBool" />
+    <SimpleProperty name="collapseState_CardDisplay" type="DomBool" />
   </SimpleProperties>
   <NestedObjects></NestedObjects>
   <ObjectLookups></ObjectLookups>
